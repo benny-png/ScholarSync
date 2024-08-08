@@ -7,7 +7,7 @@
 /coverage
 
 # production
-/dist
+
 /.cache
 
 # misc
