@@ -21,3 +21,10 @@ $ npm start
 ```
 
 Open http://localhost:3000 to see your app.
+
+
+fnm env --use-on-cd | Out-String | Invoke-Expression
+
+fnm use --install-if-missing 20
+
+npm start

@@ -612,6 +612,21 @@ const search = instantsearch({
     searchClient,
     indexName: "research_papers"
 });
+// Function to remove duplicates based on title and authors
+function removeDuplicates(hits) {
+    const uniqueHits = [];
+    const seenTitlesAndAuthors = new Set();
+    hits.forEach((hit)=>{
+        const title = hit.title.toLowerCase();
+        const authors = hit.authors.map((author)=>author.toLowerCase()).join(", ");
+        const key = `${title}-${authors}`;
+        if (!seenTitlesAndAuthors.has(key)) {
+            seenTitlesAndAuthors.add(key);
+            uniqueHits.push(hit);
+        }
+    });
+    return uniqueHits;
+}
 search.addWidgets([
     instantsearch.widgets.searchBox({
         container: "#searchbox"
@@ -645,6 +660,10 @@ search.addWidgets([
         </div>
       `;
             }
+        },
+        transformItems (items) {
+            // Apply the duplicate removal function
+            return removeDuplicates(items);
         }
     }),
     instantsearch.widgets.pagination({

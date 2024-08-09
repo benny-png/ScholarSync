@@ -18,8 +18,8 @@ const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
   //  queryBy is required.
   //  filterBy is managed and overridden by InstantSearch.js. To set it, you want to use one of the filter widgets like refinementList or use the `configure` widget.
   additionalSearchParameters: {
-    queryBy: "title,authors,name",  // Include 'name' in the query for full author names
-    queryByWeights: "1,2,3",  // Prioritize 'name' over 'authors'
+    queryBy: "title,authors,name", // Include 'name' in the query for full author names
+    queryByWeights: "1,2,3", // Prioritize 'name' over 'authors'
   },
 });
 
@@ -29,6 +29,25 @@ const search = instantsearch({
   searchClient,
   indexName: "research_papers",
 });
+
+// Function to remove duplicates based on title and authors
+function removeDuplicates(hits) {
+  const uniqueHits = [];
+  const seenTitlesAndAuthors = new Set();
+
+  hits.forEach((hit) => {
+    const title = hit.title.toLowerCase();
+    const authors = hit.authors.map((author) => author.toLowerCase()).join(", ");
+    const key = `${title}-${authors}`;
+
+    if (!seenTitlesAndAuthors.has(key)) {
+      seenTitlesAndAuthors.add(key);
+      uniqueHits.push(hit);
+    }
+  });
+
+  return uniqueHits;
+}
 
 search.addWidgets([
   instantsearch.widgets.searchBox({
@@ -63,6 +82,10 @@ search.addWidgets([
         </div>
       `;
       },
+    },
+    transformItems(items) {
+      // Apply the duplicate removal function
+      return removeDuplicates(items);
     },
   }),
   instantsearch.widgets.pagination({
